@@ -12,7 +12,7 @@ export default function Dashboard() {
 
   // Show modal after short URL created
   const showModal = (createdCode) => {
-    const backendURL = "https://url-shorten-vntg.vercel.app/"; // Manually set here there backend server url
+    const backendURL = "https://url-shorten-vntg.vercel.app"; // Manually set here there backend server url
     setShortUrl(`${backendURL}/${createdCode}`);
     setModalVisible(true);
   };
