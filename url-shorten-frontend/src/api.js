@@ -1,1 +1,1 @@
-export const API = "http://localhost:3000/api/links";
+export const API = "https://url-shorten-vntg.vercel.app/api/links";
