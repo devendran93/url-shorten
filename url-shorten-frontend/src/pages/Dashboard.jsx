@@ -2,25 +2,39 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AddLinkForm from "../components/AddLinkForm";
 import LinkTable from "../components/LinkTable";
+import SuccessModal from "../components/SuccessModal";
 import axios from "axios";
-import { API } from "../api"; // Your backend base URL
+import { API } from "../api";
 
 export default function Dashboard() {
+  const [shortUrl, setShortUrl] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
 
+  // Show modal after short URL created
+  const showModal = (createdCode) => {
+    const backendURL = "http://localhost:3000"; // Manually set here there backend server url
+    setShortUrl(`${backendURL}/${createdCode}`);
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setShortUrl("");
+  };
+
+  // Stats navigate
   const [code, setCode] = useState("");
   const navigate = useNavigate();
-
   const handleStats = () => {
     if (!code) return alert("Please enter a code");
-    // Navigate to /stats/:code page
     navigate(`/code/${code}`);
   };
 
+  // Fetch links
   const [links, setLinks] = useState([]);
-
   const fetchLinks = async () => {
     try {
-      const res = await axios.get(`${API}/codes`); // Make sure backend route exists
+      const res = await axios.get(`${API}/codes`);
       setLinks(res.data.data || []);
     } catch (err) {
       console.error("Fetch links error:", err);
@@ -34,9 +48,12 @@ export default function Dashboard() {
   return (
     <div className="max-w-4xl mx-auto p-4">
       <h1 className="text-4xl font-bold mb-4 text-center">URL Shortener</h1>
-      <AddLinkForm refresh={fetchLinks} />
+
+      <AddLinkForm refresh={fetchLinks} showModal={showModal} />
+
       <LinkTable links={links} />
-      <div className="flex items-center space-x-2">
+
+      <div className="flex items-center space-x-2 mt-4">
         <input
           type="text"
           placeholder="Enter code"
@@ -51,7 +68,9 @@ export default function Dashboard() {
           Stats
         </button>
       </div>
-    </div>
 
+      {/* Show Modal */}
+      {modalVisible && <SuccessModal url={shortUrl} onClose={closeModal} />}
+    </div>
   );
 }

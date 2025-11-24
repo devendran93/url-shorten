@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { API } from "../api";
 
-export default function AddLinkForm({ refresh }) {
+export default function AddLinkForm({ refresh, showModal }) {
   const [url, setUrl] = useState("");
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
@@ -14,11 +14,14 @@ export default function AddLinkForm({ refresh }) {
 
     setLoading(true);
     try {
-      await axios.post(API, { url, code: code || undefined });
+      const res = await axios.post(API, { url, code: code || undefined });
+
       setUrl("");
       setCode("");
       setMessage("Added successfully!");
       refresh();
+
+      showModal(res.data.data.code); // ✔️ Pass only code to parent Dashboard
     } catch (err) {
       console.error(err);
       setMessage(err.response?.data?.message || "Server error");
@@ -38,6 +41,7 @@ export default function AddLinkForm({ refresh }) {
           onChange={(e) => setUrl(e.target.value)}
           className="flex-1 p-2 border rounded"
         />
+
         <input
           type="text"
           placeholder="Custom code (optional)"
@@ -45,6 +49,7 @@ export default function AddLinkForm({ refresh }) {
           onChange={(e) => setCode(e.target.value)}
           className="w-40 p-2 border rounded"
         />
+
         <button
           type="submit"
           disabled={loading}
